@@ -68,6 +68,7 @@ MONGO_URI=mongodb://127.0.0.1:27017/team_task_manager
 JWT_SECRET=replace-with-a-long-random-secret
 JWT_EXPIRES_IN=7d
 CLIENT_URL=http://127.0.0.1:5173
+ALLOW_RAILWAY_ORIGINS=true
 ALLOW_ADMIN_SIGNUP=true
 ```
 
@@ -78,6 +79,14 @@ VITE_API_URL=http://127.0.0.1:5000/api
 ```
 
 `ALLOW_ADMIN_SIGNUP=true` is convenient for local development. If it is false, only the first registered user can choose the Admin role; later signups become Members unless an Admin promotes them.
+
+For Railway production deploys, set:
+
+```env
+CLIENT_URL=https://your-frontend.up.railway.app
+VITE_API_URL=https://your-backend.up.railway.app/api
+ALLOW_RAILWAY_ORIGINS=true
+```
 
 ## Installation
 

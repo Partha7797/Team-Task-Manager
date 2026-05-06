@@ -1,6 +1,17 @@
 import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+const configuredApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+const isBrowser = typeof window !== 'undefined';
+const isLocalHost =
+  isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+const fallbackApiUrl = isBrowser
+  ? isLocalHost
+    ? 'http://127.0.0.1:5000/api'
+    : `${window.location.origin}/api`
+  : 'http://127.0.0.1:5000/api';
+
+export const API_URL = (configuredApiUrl || fallbackApiUrl).replace(/\/+$/, '');
 
 export const api = axios.create({
   baseURL: API_URL

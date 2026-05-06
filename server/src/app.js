@@ -12,16 +12,48 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 export const app = express();
 
-const allowedOrigins = (
-  process.env.CLIENT_URL || "http://127.0.0.1:5174,http://localhost:5174"
-)
+const configuredOrigins = (process.env.CLIENT_URL || "")
   .split(",")
-  .map((origin) => origin.trim());
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const localDevOrigins = [
+  "http://127.0.0.1:5173",
+  "http://localhost:5173",
+  "http://127.0.0.1:5174",
+  "http://localhost:5174",
+];
+
+const allowRailwayOrigins = process.env.ALLOW_RAILWAY_ORIGINS !== "false";
+
+const isRailwayPublicOrigin = (origin) => {
+  try {
+    const parsed = new URL(origin);
+    return (
+      (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+      parsed.hostname.endsWith(".up.railway.app")
+    );
+  } catch {
+    return false;
+  }
+};
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (configuredOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      if (!configuredOrigins.length && localDevOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      if (allowRailwayOrigins && isRailwayPublicOrigin(origin)) {
         return callback(null, true);
       }
 
